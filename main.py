@@ -1,5 +1,8 @@
 import numpy as np
 from tensorflow.keras.optimizers import Adam
+import matplotlib.pyplot as plt
+from tslearn.shapelets import LearningShapelets
+from tslearn.utils import ts_size
 
 for source_user in ['S1', 'S2', 'S3']:
     for target_user in ['S1', 'S2', 'S3']:
@@ -36,12 +39,11 @@ for source_user in ['S1', 'S2', 'S3']:
             all_target_labels = np.load(f)
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        from tslearn.shapelets import LearningShapelets
-
-        model = LearningShapelets(n_shapelets_per_size={10: 2},
+        shapelet_sizes = {10: 3}
+        model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
                                   weight_regularizer=0.0001,
                                   optimizer=Adam(lr=0.01),
-                                  max_iter=300,
+                                  max_iter=1000,
                                   verbose=0,
                                   scale=False,
                                   random_state=42)
@@ -51,6 +53,26 @@ for source_user in ['S1', 'S2', 'S3']:
         test_distances = model.transform(all_target_bags)
         t_accuracy = model.score(all_target_bags, all_target_labels)
         shapelets = model.shapelets_as_time_series_
+
+        # Plot the different discovered shapelets
+        plt.figure()
+        for i, sz in enumerate(shapelet_sizes.keys()):
+            plt.subplot(len(shapelet_sizes), 1, i + 1)
+            plt.title("%d shapelets of size %d" % (shapelet_sizes[sz], sz))
+            for shp in model.shapelets_:
+                if ts_size(shp) == sz:
+                    plt.plot(shp.ravel())
+            plt.xlim([0, max(shapelet_sizes.keys()) - 1])
+
+        plt.tight_layout()
+        plt.show()
+
+        # The loss history is accessible via the `model_` that is a keras model
+        plt.figure()
+        plt.plot(np.arange(1, model.n_iter_ + 1), model.history_["loss"])
+        plt.title("Evolution of cross-entropy loss during training")
+        plt.xlabel("Epochs")
+        plt.show()
 
         '''
         all_source_bags = all_source_bags.astype(float)
