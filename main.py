@@ -35,7 +35,7 @@ for source_user in ['S1', 'S2', 'S3']:
             all_target_labels = np.load(f)
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        shapelet_sizes = {10: 4}
+        shapelet_sizes = {10: 16}
         model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
                                   weight_regularizer=0.0001,
                                   optimizer=Adam(lr=0.01),
