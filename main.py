@@ -3,19 +3,17 @@ from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 from tslearn.shapelets import LearningShapelets
 from tslearn.utils import ts_size
+from datetime import datetime
 
+# read dataset
+# ----------------------------------------------------------------------------------------------------------------------
 for source_user in ['S1', 'S2', 'S3']:
     for target_user in ['S1', 'S2', 'S3']:
         source_user = str(source_user)
         target_user = str(target_user)
         if source_user == target_user:
             continue
-        # problem mappings: 8_3  4_7   4_2  3_8
 
-        # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        # get features read files
-        # source_user = '3'  # 2, 3, 4, 5, 7, 8
-        # target_user = '8'
         Sampling_frequency = 30  # HZ
         Num_Seconds = 128
         Window_Overlap_Rate = 0.9
@@ -33,9 +31,18 @@ for source_user in ['S1', 'S2', 'S3']:
             all_source_labels = np.load(f)
         with open(DATASET_NAME + '_all_' + str(target_user) + '_Y_labels.npy', 'rb') as f:
             all_target_labels = np.load(f)
-        # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        # /////////////////////////////////////
+        # ----------------------------------------------------------------------------------------------------------------------
+        source_cluster_size = 100
+        source_cluster_label_list = []
+        init_class_label = -1
+        for i in range(len(all_source_labels)):
+            if i % source_cluster_size == 0:
+                init_class_label += 1
+            source_cluster_label_list.append(init_class_label)
 
-        shapelet_sizes = {10: 16}
+        print("start Time =", datetime.now().strftime("%H:%M:%S"))
+        shapelet_sizes = {10: 32}
         model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
                                   weight_regularizer=0.0001,
                                   optimizer=Adam(lr=0.01),
@@ -43,12 +50,14 @@ for source_user in ['S1', 'S2', 'S3']:
                                   verbose=0,
                                   scale=False,
                                   random_state=42)
-        model.fit(all_source_bags, all_source_labels)
+        model.fit(all_source_bags, source_cluster_label_list)
         train_distances = model.transform(all_source_bags)
-        s_accuracy = model.score(all_source_bags, all_source_labels)
-        test_distances = model.transform(all_target_bags)
-        t_accuracy = model.score(all_target_bags, all_target_labels)
-        shapelets = model.shapelets_as_time_series_
+        s_accuracy = model.score(all_source_bags, source_cluster_label_list)
+        # test_distances = model.transform(all_target_bags)
+        # t_accuracy = model.score(all_target_bags, all_target_labels)
+        # shapelets = model.shapelets_as_time_series_
+
+        print("end Time =", datetime.now().strftime("%H:%M:%S"))
 
         # Plot the different discovered shapelets
         plt.figure()
@@ -97,4 +106,3 @@ for source_user in ['S1', 'S2', 'S3']:
         true_labels = all_source_labels
         print()
         '''
-

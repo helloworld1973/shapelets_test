@@ -1,9 +1,6 @@
 import numpy as np
-from tensorflow.keras.optimizers import Adam
-import matplotlib.pyplot as plt
-from tslearn.shapelets import LearningShapelets
-from tslearn.utils import ts_size
 import plotly.graph_objects as go
+
 
 for source_user in ['S1', 'S2', 'S3']:
     for target_user in ['S1', 'S2', 'S3']:
@@ -31,19 +28,21 @@ for source_user in ['S1', 'S2', 'S3']:
 
 
         ax = all_source_bags[:, 0]
-        ay = all_source_bags[:, 1]
-        az = all_source_bags[:, 2]
-        gx = all_source_bags[:, 3]
-        gy = all_source_bags[:, 4]
-        gz = all_source_bags[:, 5]
+        #ay = all_source_bags[:, 1]
+        #az = all_source_bags[:, 2]
+        #gx = all_source_bags[:, 3]
+        #gy = all_source_bags[:, 4]
+        #gz = all_source_bags[:, 5]
         t = np.arange(len(ax))
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=t, y=ax, mode='lines+markers', name='aX-axis'))
-        fig.add_trace(go.Scatter(x=t, y=ay, mode='lines+markers', name='aY-axis'))
-        fig.add_trace(go.Scatter(x=t, y=az, mode='lines+markers', name='aZ-axis'))
-        fig.add_trace(go.Scatter(x=t, y=gx, mode='lines+markers', name='gX-axis'))
-        fig.add_trace(go.Scatter(x=t, y=gy, mode='lines+markers', name='gY-axis'))
-        fig.add_trace(go.Scatter(x=t, y=gz, mode='lines+markers', name='gZ-axis'))
+        fig.add_trace(go.Scatter(x=t, y=all_source_labels, mode='lines+markers', name='aX_label-axis'))
+
+        #fig.add_trace(go.Scatter(x=t, y=ay, mode='lines+markers', name='aY-axis'))
+        #fig.add_trace(go.Scatter(x=t, y=az, mode='lines+markers', name='aZ-axis'))
+        #fig.add_trace(go.Scatter(x=t, y=gx, mode='lines+markers', name='gX-axis'))
+        #fig.add_trace(go.Scatter(x=t, y=gy, mode='lines+markers', name='gY-axis'))
+        #fig.add_trace(go.Scatter(x=t, y=gz, mode='lines+markers', name='gZ-axis'))
         fig.update_layout(title=str(source_user) + '_', xaxis_title='Time', yaxis_title='Sensor value')
         fig.show()
         print()
