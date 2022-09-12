@@ -21,10 +21,6 @@ for source_user in ['S1', 'S2', 'S3']:
         Window_Overlap_Rate = 0.9
         DATASET_NAME = 'OPPT'
         activities_required = ['Stand', 'Walk', 'Sit', 'Lie']
-        n_state = 4
-        n_activities = 4
-        n_feature = 76
-        Cov_Type = 'diag'
         # ['lying', 'walking', 'ascending_stairs', 'descending_stairs']
         # /////////////////
         with open(DATASET_NAME + '_all_' + str(source_user) + '_' + str(Num_Seconds) + '_' + str(
@@ -39,7 +35,7 @@ for source_user in ['S1', 'S2', 'S3']:
             all_target_labels = np.load(f)
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        shapelet_sizes = {10: 3}
+        shapelet_sizes = {10: 4}
         model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
                                   weight_regularizer=0.0001,
                                   optimizer=Adam(lr=0.01),
