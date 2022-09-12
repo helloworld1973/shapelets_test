@@ -1,4 +1,6 @@
 import numpy as np
+from sklearn import mixture
+from sklearn.metrics import classification_report
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 from tslearn.shapelets import LearningShapelets
@@ -52,6 +54,14 @@ for source_user in ['S1', 'S2', 'S3']:
                                   random_state=42)
         model.fit(all_source_bags, source_cluster_label_list)
         train_distances = model.transform(all_source_bags)
+        probability = model.predict_proba(all_source_bags)
+        predict_label = model.predict(all_source_bags)
+        gmm = mixture.GaussianMixture(n_components=4, covariance_type='diag')
+        gmm.fit(probability)
+        gmm_labels = gmm.predict(probability)
+        classify_results = classification_report(all_source_labels, gmm_labels)
+
+
         s_accuracy = model.score(all_source_bags, source_cluster_label_list)
         # test_distances = model.transform(all_target_bags)
         # t_accuracy = model.score(all_target_bags, all_target_labels)
