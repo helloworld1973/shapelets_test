@@ -17,8 +17,8 @@ for source_user in ['S1', 'S2', 'S3']:
         # source_user = '3'  # 2, 3, 4, 5, 7, 8
         # target_user = '8'
         Sampling_frequency = 30  # HZ
-        Num_Seconds = 0.3
-        Window_Overlap_Rate = 0.5
+        Num_Seconds = 128
+        Window_Overlap_Rate = 0.9
         DATASET_NAME = 'OPPT'
         activities_required = ['Stand', 'Walk', 'Sit', 'Lie']
         n_state = 4
@@ -28,10 +28,10 @@ for source_user in ['S1', 'S2', 'S3']:
         # ['lying', 'walking', 'ascending_stairs', 'descending_stairs']
         # /////////////////
         with open(DATASET_NAME + '_all_' + str(source_user) + '_' + str(Num_Seconds) + '_' + str(
-                Window_Overlap_Rate) + '_X_features.npy', 'rb') as f:
+                Window_Overlap_Rate) + '_X_timesteps.npy', 'rb') as f:
             all_source_bags = np.load(f, allow_pickle=True)
         with open(DATASET_NAME + '_all_' + str(target_user) + '_' + str(Num_Seconds) + '_' + str(
-                Window_Overlap_Rate) + '_X_features.npy', 'rb') as f:
+                Window_Overlap_Rate) + '_X_timesteps.npy', 'rb') as f:
             all_target_bags = np.load(f, allow_pickle=True)
         with open(DATASET_NAME + '_all_' + str(source_user) + '_Y_labels.npy', 'rb') as f:
             all_source_labels = np.load(f)
@@ -39,11 +39,11 @@ for source_user in ['S1', 'S2', 'S3']:
             all_target_labels = np.load(f)
         # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        shapelet_sizes = {10: 2}
+        shapelet_sizes = {10: 3}
         model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
                                   weight_regularizer=0.0001,
                                   optimizer=Adam(lr=0.01),
-                                  max_iter=100,
+                                  max_iter=150,
                                   verbose=0,
                                   scale=False,
                                   random_state=42)
