@@ -44,25 +44,29 @@ for source_user in ['S1', 'S2', 'S3']:
             source_cluster_label_list.append(init_class_label)
 
         print("start Time =", datetime.now().strftime("%H:%M:%S"))
-        shapelet_sizes = {10: 32}
+        shapelet_sizes = {10: 2}
         model = LearningShapelets(n_shapelets_per_size=shapelet_sizes,
-                                  weight_regularizer=0.0001,
-                                  optimizer=Adam(lr=0.01),
-                                  max_iter=150,
-                                  verbose=0,
-                                  scale=False,
-                                  random_state=42)
+                                  optimizer=Adam(lr=0.05),
+                                  max_iter=150)
         model.fit(all_source_bags, source_cluster_label_list)
-        train_distances = model.transform(all_source_bags)
-        probability = model.predict_proba(all_source_bags)
-        predict_label = model.predict(all_source_bags)
+
+        model.to_hdf5('./ShapeletsModel_' + str(shapelet_sizes))
+
+        model_new = LearningShapelets()
+        model_new.from_hdf5('./ShapeletsModel_' + str(shapelet_sizes))
+
+        train_distances = model_new.transform(all_source_bags)
+
+        acc = model_new.score(all_source_bags, source_cluster_label_list)
+        probability = model_new.predict_proba(all_source_bags)
+        predict_label = model_new.predict(all_source_bags)
         gmm = mixture.GaussianMixture(n_components=4, covariance_type='diag')
-        gmm.fit(probability)
-        gmm_labels = gmm.predict(probability)
-        classify_results = classification_report(all_source_labels, gmm_labels)
+        gmm.fit(train_distances)
+        gmm_labels = gmm.predict(train_distances)
+        #classify_results = classification_report(all_source_labels, gmm_labels)
 
 
-        s_accuracy = model.score(all_source_bags, source_cluster_label_list)
+        s_accuracy = model_new.score(all_source_bags, source_cluster_label_list)
         # test_distances = model.transform(all_target_bags)
         # t_accuracy = model.score(all_target_bags, all_target_labels)
         # shapelets = model.shapelets_as_time_series_
